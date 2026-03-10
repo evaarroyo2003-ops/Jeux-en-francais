@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Marché Français - Vocabulaire de la Nourriture</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fa709a;
+            margin-bottom: 10px;
+            font-size: 3em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 1.3em;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .level-description {
+            background: #f5f5f5;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px auto;
+            max-width: 800px;
+            text-align: left;
+        }
+
+        .level-description h3 {
+            color: #fa709a;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .level-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .level-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #fa709a;
+        }
+
+        .level-card h4 {
+            color: #fa709a;
+            margin-bottom: 10px;
+        }
+
+        .level-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .level-card li {
+            padding: 5px 0;
+            font-size: 1em;
+        }
+
+        .level-card li:before {
+            content: "✓ ";
+            color: #38ef7d;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        /* Game Info */
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            border-radius: 15px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin: 10px;
+        }
+
+        .info-value {
+            display: block;
+            font-size: 1.6em;
+            color: #fa709a;
+            margin-top: 5px;
+        }
+
+        /* Market Scene */
+        .market-scene {
+            background: linear-gradient(to bottom, #87CEEB 0%, #90EE90 50%, #8B4513 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 25px;
+            min-height: 350px;
+            position: relative;
+            border: 5px solid #8B4513;
+        }
+
+        .market-stall {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 700px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .vendor {
+            text-align: center;
+            font-size: 5em;
+            margin-bottom: 15px;
+            animation: wave 2s infinite;
+        }
+
+        @keyframes wave {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+
+        .speech-bubble {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 600px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: 3px solid #fa709a;
+        }
+
+        .speech-bubble:before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 15px solid #fa709a;
+        }
+
+        .question-text {
+            font-size: 1.8em;
+            color: #333;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .food-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+
+        .food-emoji {
+            font-size: 6em;
+            animation: bounce 2s infinite;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Options Grid */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .option-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 25px 20px;
+            font-size: 1.3em;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            animation: celebrate 0.6s;
+        }
+
+        .option-btn.wrong {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            animation: shake 0.6s;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-10deg); }
+            75% { transform: scale(1.2) rotate(10deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-15px); }
+            75% { transform: translateX(15px); }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 25px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 35px;
+            background: #e0e0e0;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* Lives */
+        .lives-display {
+            text-align: center;
+            font-size: 2.8em;
+            margin-bottom: 20px;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            margin-top: 25px;
+            min-height: 120px;
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: rgba(56, 239, 125, 0.15);
+            border: 3px solid #38ef7d;
+            color: #11998e;
+        }
+
+        .feedback.wrong {
+            background: rgba(235, 51, 73, 0.15);
+            border: 3px solid #eb3349;
+            color: #eb3349;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            font-size: 0.85em;
+            color: #666;
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.4em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Game Over */
+        .game-over {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .final-score {
+            font-size: 4.5em;
+            color: #fa709a;
+            margin: 25px 0;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin: 35px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.2em;
+            color: #fa709a;
+            font-weight: bold;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        /* Decorative elements */
+        .floating-food {
+            position: absolute;
+            font-size: 2.5em;
+            animation: float 4s infinite ease-in-out;
+            opacity: 0.4;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-25px) rotate(180deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- START SCREEN -->
+        <div id="startScreen" class="start-screen">
+            <h1>🛒 LE MARCHÉ FRANÇAIS 🛒</h1>
+            <p class="subtitle">
+                Teste ton vocabulaire de la nourriture!<br>
+                Regarde l'image et choisis le bon mot en français!
+            </p>
+
+            <div class="level-description">
+                <h3>📚 Choisis ton niveau de difficulté:</h3>
+                <div class="level-info">
+                    <div class="level-card">
+                        <h4>😊 NIVEAU FACILE</h4>
+                        <ul>
+                            <li>4 vies</li>
+                            <li>15 questions</li>
+                            <li>3 options de réponse</li>
+                            <li>Vocabulaire basique</li>
+                            <li>Parfait pour débuter!</li>
+                        </ul>
+                    </div>
+                    <div class="level-card">
+                        <h4>😐 NIVEAU MOYEN</h4>
+                        <ul>
+                            <li>3 vies</li>
+                            <li>20 questions</li>
+                            <li>4 options de réponse</li>
+                            <li>Vocabulaire varié</li>
+                            <li>Un bon défi!</li>
+                        </ul>
+                    </div>
+                    <div class="level-card">
+                        <h4>😤 NIVEAU DIFFICILE</h4>
+                        <ul>
+                            <li>2 vies</li>
+                            <li>25 questions</li>
+                            <li>4 options de réponse</li>
+                            <li>Tout le vocabulaire</li>
+                            <li>Pour les experts!</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin: 40px 0;">
+                <button class="btn" onclick="startGame('facile')">😊 Facile</button>
+                <button class="btn" onclick="startGame('moyen')">😐 Moyen</button>
+                <button class="btn" onclick="startGame('difficile')">😤 Difficile</button>
+            </div>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="gameScreen" style="display: none;">
+            <h1>🛒 LE MARCHÉ FRANÇAIS 🛒</h1>
+
+            <div class="game-info">
+                <div class="info-item">
+                    🏆 Score
+                    <span class="info-value" id="score">0</span>
+                </div>
+                <div class="info-item">
+                    📊 Niveau
+                    <span class="info-value" id="difficulty">-</span>
+                </div>
+                <div class="info-item">
+                    ⭐ Série
+                    <span class="info-value" id="streak">0</span>
+                </div>
+            </div>
+
+            <div class="lives-display" id="lives"></div>
+
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar">
+                        <span id="progressText">1/15</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="market-scene" id="marketScene">
+                <div class="vendor" id="vendor">👨‍🌾</div>
+                
+                <div class="speech-bubble">
+                    <div class="category-badge" id="categoryBadge">Catégorie</div>
+                    <div class="question-text" id="questionText">Comment ça s'appelle en français?</div>
+                    <div class="food-display">
+                        <div class="food-emoji" id="foodEmoji">🍎</div>
+                    </div>
+                </div>
+
+                <div class="options-grid" id="optionsGrid"></div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- GAME OVER SCREEN -->
+        <div id="gameOverScreen" class="game-over" style="display: none;">
+            <h1>🎮 PARTIE TERMINÉE! 🎮</h1>
+            
+            <div class="final-score">
+                <span id="finalScore">0</span> points
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">✅ Bonnes réponses</div>
+                    <div class="stat-value" id="correctCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">❌ Erreurs</div>
+                    <div class="stat-value" id="wrongCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">🎯 Précision</div>
+                    <div class="stat-value" id="accuracy">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">⭐ Meilleure série</div>
+                    <div class="stat-value" id="maxStreak">0</div>
+                </div>
+            </div>
+
+            <p id="finalMessage" style="font-size: 1.6em; margin: 25px 0; font-weight: bold; color: #fa709a;"></p>
+
+            <button class="btn" onclick="restartGame()">🔄 Rejouer</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de données complète du vocabulaire
+        const vocabularyDatabase = [
+            // FRUITS
+            { word: "une pomme", emoji: "🍎", category: "Fruits", gender: "féminin" },
+            { word: "une banane", emoji: "🍌", category: "Fruits", gender: "féminin" },
+            { word: "une orange", emoji: "🍊", category: "Fruits", gender: "féminin" },
+            { word: "une poire", emoji: "🍐", category: "Fruits", gender: "féminin" },
+            { word: "une fraise", emoji: "🍓", category: "Fruits", gender: "féminin" },
+            { word: "une cerise", emoji: "🍒", category: "Fruits", gender: "féminin" },
+            { word: "un raisin", emoji: "🍇", category: "Fruits", gender: "masculin" },
+            { word: "une pastèque", emoji: "🍉", category: "Fruits", gender: "féminin" },
+            { word: "un citron", emoji: "🍋", category: "Fruits", gender: "masculin" },
+            { word: "une pêche", emoji: "🍑", category: "Fruits", gender: "féminin" },
+            
+            // LÉGUMES
+            { word: "une carotte", emoji: "🥕", category: "Légumes", gender: "féminin" },
+            { word: "une tomate", emoji: "🍅", category: "Légumes", gender: "féminin" },
+            { word: "un brocoli", emoji: "🥦", category: "Légumes", gender: "masculin" },
+            { word: "une salade", emoji: "🥗", category: "Légumes", gender: "féminin" },
+            { word: "un concombre", emoji: "🥒", category: "Légumes", gender: "masculin" },
+            { word: "un poivron", emoji: "🫑", category: "Légumes", gender: "masculin" },
+            { word: "un oignon", emoji: "🧅", category: "Légumes", gender: "masculin" },
+            { word: "une pomme de terre", emoji: "🥔", category: "Légumes", gender: "féminin" },
+            
+            // VIANDE ET POISSON
+            { word: "du poulet", emoji: "🍗", category: "Viande", gender: "masculin" },
+            { word: "de la viande", emoji: "🥩", category: "Viande", gender: "féminin" },
+            { word: "du poisson", emoji: "🐟", category: "Poisson", gender: "masculin" },
+            { word: "du jambon", emoji: "🥓", category: "Viande", gender: "masculin" },
+            
+            // PRODUITS LAITIERS
+            { word: "du fromage", emoji: "🧀", category: "Produits laitiers", gender: "masculin" },
+            { word: "du lait", emoji: "🥛", category: "Produits laitiers", gender: "masculin" },
+            { word: "du beurre", emoji: "🧈", category: "Produits laitiers", gender: "masculin" },
+            { word: "un yaourt", emoji: "🍮", category: "Produits laitiers", gender: "masculin" },
+            { word: "des œufs", emoji: "🥚", category: "Produits laitiers", gender: "pluriel" },
+            
+            // PAIN ET PÂTISSERIE
+            { word: "du pain", emoji: "🥖", category: "Boulangerie", gender: "masculin" },
+            { word: "un croissant", emoji: "🥐", category: "Boulangerie", gender: "masculin" },
+            { word: "un gâteau", emoji: "🍰", category: "Desserts", gender: "masculin" },
+            { word: "des biscuits", emoji: "🍪", category: "Desserts", gender: "pluriel" },
+            
+            // FÉCULENTS
+            { word: "des pâtes", emoji: "🍝", category: "Féculents", gender: "pluriel" },
+            { word: "du riz", emoji: "🍚", category: "Féculents", gender: "masculin" },
+            { word: "des frites", emoji: "🍟", category: "Féculents", gender: "pluriel" },
+            
+            // BOISSONS
+            { word: "de l'eau", emoji: "💧", category: "Boissons", gender: "féminin" },
+            { word: "du jus d'orange", emoji: "🧃", category: "Boissons", gender: "masculin" },
+            { word: "du café", emoji: "☕", category: "Boissons", gender: "masculin" },
+            { word: "du thé", emoji: "🍵", category: "Boissons", gender: "masculin" },
+            
+            // DESSERTS
+            { word: "de la glace", emoji: "🍨", category: "Desserts", gender: "féminin" },
+            { word: "du chocolat", emoji: "🍫", category: "Desserts", gender: "masculin" },
+            { word: "des bonbons", emoji: "🍬", category: "Desserts", gender: "pluriel" },
+            
+            // AUTRES
+            { word: "de la pizza", emoji: "🍕", category: "Plats", gender: "féminin" },
+            { word: "un hamburger", emoji: "🍔", category: "Plats", gender: "masculin" },
+            { word: "de la soupe", emoji: "🍲", category: "Plats", gender: "féminin" },
+            { word: "de la confiture", emoji: "🍯", category: "Condiments", gender: "féminin" },
+            { word: "du sucre", emoji: "🍬", category: "Condiments", gender: "masculin" }
+        ];
+
+        // Variables du jeu
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let lives = 3;
+        let currentRound = 0;
+        let maxRounds = 20;
+        let difficulty = 'moyen';
+        let correctAnswers = 0;
+        let wrongAnswers = 0;
+        let gameQuestions = [];
+        let currentQuestion = null;
+        let optionsCount = 4;
+
+        const vendors = ["👨‍🌾", "👩‍🌾", "👨‍🍳", "👩‍🍳"];
+        const decorativeFood = ["🍎", "🥕", "🍞", "🧀", "🥐", "🍇"];
+
+        function startGame(level) {
+            difficulty = level;
+            
+            // Réinitialisation
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            currentRound = 0;
+            correctAnswers = 0;
+            wrongAnswers = 0;
+            
+            // Configuration selon difficulté
+            if (level === 'facile') {
+                lives = 4;
+                maxRounds = 15;
+                optionsCount = 3;
+            } else if (level === 'moyen') {
+                lives = 3;
+                maxRounds = 20;
+                optionsCount = 4;
+            } else {
+                lives = 2;
+                maxRounds = 25;
+                optionsCount = 4;
+            }
+            
+            // Préparer les questions
+            prepareQuestions();
+            
+            // Affichage
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('gameOverScreen').style.display = 'none';
+            
+            document.getElementById('difficulty').textContent = level.charAt(0).toUpperCase() + level.slice(1);
+            document.getElementById('score').textContent = '0';
+            document.getElementById('streak').textContent = '0';
+            
+            updateLives();
+            addDecorativeFood();
+            nextQuestion();
+        }
+
+        function prepareQuestions() {
+            // Mélanger et sélectionner les questions
+            gameQuestions = [...vocabularyDatabase].sort(() => Math.random() - 0.5).slice(0, maxRounds);
+        }
+
+        function addDecorativeFood() {
+            const scene = document.getElementById('marketScene');
+            // Nettoyer les anciens
+            document.querySelectorAll('.floating-food').forEach(e => e.remove());
+            
+            for (let i = 0; i < 8; i++) {
+                const food = document.createElement('div');
+                food.className = 'floating-food';
+                food.textContent = decorativeFood[Math.floor(Math.random() * decorativeFood.length)];
+                food.style.left = Math.random() * 85 + '%';
+                food.style.top = Math.random() * 70 + '%';
+                food.style.animationDelay = Math.random() * 3 + 's';
+                scene.appendChild(food);
+            }
+        }
+
+        function updateLives() {
+            const maxLives = difficulty === 'facile' ? 4 : difficulty === 'moyen' ? 3 : 2;
+            document.getElementById('lives').innerHTML = '❤️'.repeat(lives) + '🖤'.repeat(maxLives - lives);
+        }
+
+        function nextQuestion() {
+            if (currentRound >= maxRounds || lives <= 0) {
+                endGame();
+                return;
+            }
+
+            currentQuestion = gameQuestions[currentRound];
+            currentRound++;
+            
+            // Mise à jour progression
+            const progress = (currentRound / maxRounds) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = currentRound + '/' + maxRounds;
+            
+            // Changer le vendeur aléatoirement
+            document.getElementById('vendor').textContent = vendors[Math.floor(Math.random() * vendors.length)];
+            
+            // Afficher la question
+            document.getElementById('categoryBadge').textContent = currentQuestion.category;
+            document.getElementById('questionText').textContent = "Comment ça s'appelle en français?";
+            document.getElementById('foodEmoji').textContent = currentQuestion.emoji;
+            
+            // Créer les options
+            createOptions();
+            
+            // Reset feedback
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+        }
+
+        function createOptions() {
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+            
+            // Créer un pool d'options
+            let options = [currentQuestion];
+            let wrongOptions = vocabularyDatabase.filter(item => item.word !== currentQuestion.word);
+            
+            // Mélanger et prendre le nombre nécessaire d'options incorrectes
+            wrongOptions = wrongOptions.sort(() => Math.random() - 0.5).slice(0, optionsCount - 1);
+            options = options.concat(wrongOptions);
+            
+            // Mélanger toutes les options
+            options = options.sort(() => Math.random() - 0.5);
+            
+            // Créer les boutons
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option.word;
+                btn.onclick = () => checkAnswer(option, btn);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, button) {
+            const allButtons = document.querySelectorAll('.option-btn');
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            const feedbackElement = document.getElementById('feedback');
+            
+            if (selected.word === currentQuestion.word) {
+                // CORRECT
+                button.classList.add('correct');
+                correctAnswers++;
+                streak++;
+                
+                if (streak > maxStreak) {
+                    maxStreak = streak;
+                }
+                
+                const points = 10 + (streak > 1 ? (streak - 1) * 5 : 0);
+                score += points;
+                
+                let feedbackHTML = `✅ <strong>BRAVO!</strong><br>`;
+                feedbackHTML += `C'est bien <strong>${currentQuestion.word}</strong>!<br>`;
+                feedbackHTML += `+${points} points`;
+                
+                if (streak > 2) {
+                    feedbackHTML += `<br>⭐ <strong>Série de ${streak}!</strong> Continue comme ça!`;
+                }
+                
+                feedbackHTML += `<div class="explanation">📚 Catégorie: ${currentQuestion.category}</div>`;
+                
+                feedbackElement.innerHTML = feedbackHTML;
+                feedbackElement.className = 'feedback correct';
+                
+                document.getElementById('score').textContent = score;
+                document.getElementById('streak').textContent = streak;
+                
+                setTimeout(() => nextQuestion(), 2500);
+                
+            } else {
+                // INCORRECT
+                button.classList.add('wrong');
+                wrongAnswers++;
+                streak = 0;
+                lives--;
+                
+                updateLives();
+                
+                // Montrer la bonne réponse
+                allButtons.forEach(btn => {
+                    if (btn.textContent === currentQuestion.word) {
+                        btn.classList.add('correct');
+                    }
+                });
+                
+                let feedbackHTML = `❌ <strong>Pas tout à fait...</strong><br>`;
+                feedbackHTML += `La bonne réponse était: <strong>${currentQuestion.word}</strong><br>`;
+                feedbackHTML += `<div class="explanation">📚 C'est dans la catégorie: ${currentQuestion.category}</div>`;
+                
+                feedbackElement.innerHTML = feedbackHTML;
+                feedbackElement.className = 'feedback wrong';
+                
+                document.getElementById('streak').textContent = '0';
+                
+                if (lives <= 0) {
+                    setTimeout(() => endGame(), 3000);
+                } else {
+                    setTimeout(() => nextQuestion(), 3000);
+                }
+            }
+        }
+
+        function endGame() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'block';
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('correctCount').textContent = correctAnswers;
+            document.getElementById('wrongCount').textContent = wrongAnswers;
+            
+            const totalAnswers = correctAnswers + wrongAnswers;
+            const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            document.getElementById('maxStreak').textContent = maxStreak;
+            
+            let message = '';
+            if (accuracy >= 90) {
+                message = '🌟 PARFAIT! Tu maîtrises le vocabulaire! 🌟';
+            } else if (accuracy >= 75) {
+                message = '🎉 EXCELLENT! Très bon niveau! 🎉';
+            } else if (accuracy >= 60) {
+                message = '👍 BIEN! Continue à pratiquer! 👍';
+            } else if (accuracy >= 40) {
+                message = '😊 PAS MAL! Tu progresses! 😊';
+            } else {
+                message = '💪 COURAGE! Révise le vocabulaire! 💪';
+            }
+            
+            document.getElementById('finalMessage').textContent = message;
+        }
+
+        function restartGame() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+            
+            // Nettoyer les éléments décoratifs
+            document.querySelectorAll('.floating-food').forEach(e => e.remove());
+        }
+    </script>
+</body>
+</html>
