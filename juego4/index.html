@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quelle Heure Est-Il? - Jeu des Heures</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 3em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 1.3em;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .level-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .level-card h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .level-card ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+
+        .level-card li {
+            padding: 8px 0;
+            font-size: 1.1em;
+        }
+
+        .level-card li:before {
+            content: "✓ ";
+            color: #38ef7d;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        /* Game Info */
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            border-radius: 15px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin: 10px;
+        }
+
+        .info-value {
+            display: block;
+            font-size: 1.8em;
+            color: #667eea;
+            margin-top: 5px;
+        }
+
+        /* Clock Display */
+        .clock-container {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 40px;
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe6cc 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .clock {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: white;
+            border: 10px solid #333;
+            position: relative;
+            margin: 0 auto 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .clock-center {
+            width: 20px;
+            height: 20px;
+            background: #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .hand {
+            position: absolute;
+            background: #333;
+            transform-origin: bottom center;
+            left: 50%;
+            bottom: 50%;
+            border-radius: 10px;
+        }
+
+        .hour-hand {
+            width: 8px;
+            height: 80px;
+            margin-left: -4px;
+            background: #333;
+        }
+
+        .minute-hand {
+            width: 6px;
+            height: 120px;
+            margin-left: -3px;
+            background: #667eea;
+        }
+
+        .clock-numbers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .clock-number {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .question-text {
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        /* Options */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .option-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 25px 20px;
+            font-size: 1.2em;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            animation: celebrate 0.6s;
+        }
+
+        .option-btn.wrong {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            animation: shake 0.6s;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.15) rotate(-8deg); }
+            75% { transform: scale(1.15) rotate(8deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-12px); }
+            75% { transform: translateX(12px); }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 35px;
+            background: #e0e0e0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* Lives */
+        .lives-display {
+            text-align: center;
+            font-size: 2.8em;
+            margin-bottom: 20px;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            margin-top: 25px;
+            min-height: 100px;
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: rgba(56, 239, 125, 0.15);
+            border: 3px solid #38ef7d;
+            color: #11998e;
+        }
+
+        .feedback.wrong {
+            background: rgba(235, 51, 73, 0.15);
+            border: 3px solid #eb3349;
+            color: #eb3349;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.4em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Game Over */
+        .game-over {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .final-score {
+            font-size: 4.5em;
+            color: #667eea;
+            margin: 25px 0;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 35px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.2em;
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- START SCREEN -->
+        <div id="startScreen" class="start-screen">
+            <h1>⏰ QUELLE HEURE EST-IL? ⏰</h1>
+            <p class="subtitle">
+                Apprends à lire l'heure en français!<br>
+                Regarde l'horloge et choisis la bonne réponse!
+            </p>
+
+            <div class="level-grid">
+                <div class="level-card">
+                    <h3>😊 FACILE</h3>
+                    <ul>
+                        <li>4 vies</li>
+                        <li>15 questions</li>
+                        <li>Heures simples</li>
+                        <li>3 options</li>
+                        <li>Parfait pour débuter!</li>
+                    </ul>
+                    <button class="btn" onclick="startGame('facile')" style="width: 100%; margin-top: 20px;">Commencer</button>
+                </div>
+
+                <div class="level-card">
+                    <h3>😐 MOYEN</h3>
+                    <ul>
+                        <li>3 vies</li>
+                        <li>20 questions</li>
+                        <li>Et quart, et demie</li>
+                        <li>4 options</li>
+                        <li>Un bon challenge!</li>
+                    </ul>
+                    <button class="btn" onclick="startGame('moyen')" style="width: 100%; margin-top: 20px;">Commencer</button>
+                </div>
+
+                <div class="level-card">
+                    <h3>😤 DIFFICILE</h3>
+                    <ul>
+                        <li>2 vies</li>
+                        <li>25 questions</li>
+                        <li>Moins le quart</li>
+                        <li>4 options</li>
+                        <li>Pour les experts!</li>
+                    </ul>
+                    <button class="btn" onclick="startGame('difficile')" style="width: 100%; margin-top: 20px;">Commencer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="gameScreen" style="display: none;">
+            <h1>⏰ QUELLE HEURE EST-IL? ⏰</h1>
+
+            <div class="game-info">
+                <div class="info-item">
+                    🏆 Score
+                    <span class="info-value" id="score">0</span>
+                </div>
+                <div class="info-item">
+                    📊 Niveau
+                    <span class="info-value" id="difficulty">-</span>
+                </div>
+                <div class="info-item">
+                    ⭐ Série
+                    <span class="info-value" id="streak">0</span>
+                </div>
+            </div>
+
+            <div class="lives-display" id="lives"></div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar">
+                    <span id="progressText">1/15</span>
+                </div>
+            </div>
+
+            <div class="clock-container">
+                <div class="clock" id="clock">
+                    <div class="clock-center"></div>
+                    <div class="hand hour-hand" id="hourHand"></div>
+                    <div class="hand minute-hand" id="minuteHand"></div>
+                </div>
+                <div class="question-text">Quelle heure est-il?</div>
+            </div>
+
+            <div class="options-grid" id="optionsGrid"></div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- GAME OVER SCREEN -->
+        <div id="gameOverScreen" class="game-over" style="display: none;">
+            <h1>🎮 PARTIE TERMINÉE! 🎮</h1>
+            
+            <div class="final-score">
+                <span id="finalScore">0</span> points
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">✅ Bonnes réponses</div>
+                    <div class="stat-value" id="correctCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">❌ Erreurs</div>
+                    <div class="stat-value" id="wrongCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">🎯 Précision</div>
+                    <div class="stat-value" id="accuracy">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">⭐ Meilleure série</div>
+                    <div class="stat-value" id="maxStreak">0</div>
+                </div>
+            </div>
+
+            <p id="finalMessage" style="font-size: 1.6em; margin: 25px 0; font-weight: bold; color: #667eea;"></p>
+
+            <button class="btn" onclick="restartGame()">🔄 Rejouer</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de données des heures
+        const timeDatabase = {
+            facile: [
+                { digital: "7:00", text: "Il est sept heures", hour: 7, minute: 0 },
+                { digital: "8:00", text: "Il est huit heures", hour: 8, minute: 0 },
+                { digital: "9:00", text: "Il est neuf heures", hour: 9, minute: 0 },
+                { digital: "10:00", text: "Il est dix heures", hour: 10, minute: 0 },
+                { digital: "11:00", text: "Il est onze heures", hour: 11, minute: 0 },
+                { digital: "12:00", text: "Il est midi", hour: 12, minute: 0 },
+                { digital: "13:00", text: "Il est treize heures", hour: 13, minute: 0 },
+                { digital: "14:00", text: "Il est quatorze heures", hour: 14, minute: 0 },
+                { digital: "15:00", text: "Il est quinze heures", hour: 15, minute: 0 },
+                { digital: "16:00", text: "Il est seize heures", hour: 16, minute: 0 },
+                { digital: "17:00", text: "Il est dix-sept heures", hour: 17, minute: 0 },
+                { digital: "18:00", text: "Il est dix-huit heures", hour: 18, minute: 0 },
+                { digital: "20:00", text: "Il est vingt heures", hour: 20, minute: 0 },
+                { digital: "21:00", text: "Il est vingt et une heures", hour: 21, minute: 0 },
+                { digital: "0:00", text: "Il est minuit", hour: 0, minute: 0 }
+            ],
+            moyen: [
+                { digital: "7:15", text: "Il est sept heures et quart", hour: 7, minute: 15 },
+                { digital: "8:30", text: "Il est huit heures et demie", hour: 8, minute: 30 },
+                { digital: "9:15", text: "Il est neuf heures et quart", hour: 9, minute: 15 },
+                { digital: "10:30", text: "Il est dix heures et demie", hour: 10, minute: 30 },
+                { digital: "12:15", text: "Il est midi et quart", hour: 12, minute: 15 },
+                { digital: "14:30", text: "Il est quatorze heures et demie", hour: 14, minute: 30 },
+                { digital: "15:15", text: "Il est quinze heures et quart", hour: 15, minute: 15 },
+                { digital: "16:30", text: "Il est seize heures et demie", hour: 16, minute: 30 },
+                { digital: "18:15", text: "Il est dix-huit heures et quart", hour: 18, minute: 15 },
+                { digital: "20:30", text: "Il est vingt heures et demie", hour: 20, minute: 30 },
+                { digital: "7:10", text: "Il est sept heures dix", hour: 7, minute: 10 },
+                { digital: "8:20", text: "Il est huit heures vingt", hour: 8, minute: 20 },
+                { digital: "14:05", text: "Il est quatorze heures cinq", hour: 14, minute: 5 },
+                { digital: "16:25", text: "Il est seize heures vingt-cinq", hour: 16, minute: 25 },
+                { digital: "21:10", text: "Il est vingt et une heures dix", hour: 21, minute: 10 }
+            ],
+            difficile: [
+                { digital: "7:45", text: "Il est huit heures moins le quart", hour: 7, minute: 45 },
+                { digital: "8:45", text: "Il est neuf heures moins le quart", hour: 8, minute: 45 },
+                { digital: "9:40", text: "Il est dix heures moins vingt", hour: 9, minute: 40 },
+                { digital: "10:50", text: "Il est onze heures moins dix", hour: 10, minute: 50 },
+                { digital: "11:55", text: "Il est midi moins cinq", hour: 11, minute: 55 },
+                { digital: "13:45", text: "Il est quatorze heures moins le quart", hour: 13, minute: 45 },
+                { digital: "14:40", text: "Il est quinze heures moins vingt", hour: 14, minute: 40 },
+                { digital: "15:50", text: "Il est seize heures moins dix", hour: 15, minute: 50 },
+                { digital: "16:45", text: "Il est dix-sept heures moins le quart", hour: 16, minute: 45 },
+                { digital: "18:55", text: "Il est dix-neuf heures moins cinq", hour: 18, minute: 55 },
+                { digital: "19:40", text: "Il est vingt heures moins vingt", hour: 19, minute: 40 },
+                { digital: "20:45", text: "Il est vingt et une heures moins le quart", hour: 20, minute: 45 },
+                { digital: "22:50", text: "Il est vingt-trois heures moins dix", hour: 22, minute: 50 },
+                { digital: "23:55", text: "Il est minuit moins cinq", hour: 23, minute: 55 },
+                { digital: "6:35", text: "Il est sept heures moins vingt-cinq", hour: 6, minute: 35 }
+            ]
+        };
+
+        // Variables du jeu
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let lives = 3;
+        let currentRound = 0;
+        let maxRounds = 20;
+        let difficulty = 'moyen';
+        let correctAnswers = 0;
+        let wrongAnswers = 0;
+        let gameQuestions = [];
+        let currentQuestion = null;
+        let optionsCount = 4;
+
+        function startGame(level) {
+            difficulty = level;
+            
+            // Réinitialisation
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            currentRound = 0;
+            correctAnswers = 0;
+            wrongAnswers = 0;
+            
+            // Configuration selon difficulté
+            if (level === 'facile') {
+                lives = 4;
+                maxRounds = 15;
+                optionsCount = 3;
+            } else if (level === 'moyen') {
+                lives = 3;
+                maxRounds = 20;
+                optionsCount = 4;
+            } else {
+                lives = 2;
+                maxRounds = 25;
+                optionsCount = 4;
+            }
+            
+            // Préparer les questions
+            prepareQuestions();
+            
+            // Affichage
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('gameOverScreen').style.display = 'none';
+            
+            document.getElementById('difficulty').textContent = level.charAt(0).toUpperCase() + level.slice(1);
+            document.getElementById('score').textContent = '0';
+            document.getElementById('streak').textContent = '0';
+            
+            updateLives();
+            nextQuestion();
+        }
+
+        function prepareQuestions() {
+            const pool = timeDatabase[difficulty];
+            gameQuestions = [...pool].sort(() => Math.random() - 0.5).slice(0, maxRounds);
+        }
+
+        function updateLives() {
+            const maxLives = difficulty === 'facile' ? 4 : difficulty === 'moyen' ? 3 : 2;
+            document.getElementById('lives').innerHTML = '❤️'.repeat(lives) + '🖤'.repeat(maxLives - lives);
+        }
+
+        function setClock(hour, minute) {
+            const hourHand = document.getElementById('hourHand');
+            const minuteHand = document.getElementById('minuteHand');
+            
+            // Calcul des angles
+            const hourAngle = (hour % 12) * 30 + minute * 0.5;
+            const minuteAngle = minute * 6;
+            
+            hourHand.style.transform = `rotate(${hourAngle}deg)`;
+            minuteHand.style.transform = `rotate(${minuteAngle}deg)`;
+        }
+
+        function nextQuestion() {
+            if (currentRound >= maxRounds || lives <= 0) {
+                endGame();
+                return;
+            }
+
+            currentQuestion = gameQuestions[currentRound];
+            currentRound++;
+            
+            // Mise à jour progression
+            const progress = (currentRound / maxRounds) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = currentRound + '/' + maxRounds;
+            
+            // Afficher l'horloge
+            setClock(currentQuestion.hour, currentQuestion.minute);
+            
+            // Créer les options
+            createOptions();
+            
+            // Reset feedback
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+        }
+
+        function createOptions() {
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+            
+            // Créer un pool d'options
+            let options = [currentQuestion];
+            let allTimes = timeDatabase[difficulty];
+            let wrongOptions = allTimes.filter(item => item.text !== currentQuestion.text);
+            
+            // Mélanger et prendre le nombre nécessaire
+            wrongOptions = wrongOptions.sort(() => Math.random() - 0.5).slice(0, optionsCount - 1);
+            options = options.concat(wrongOptions);
+            
+            // Mélanger toutes les options
+            options = options.sort(() => Math.random() - 0.5);
+            
+            // Créer les boutons
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option.text;
+                btn.onclick = () => checkAnswer(option, btn);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, button) {
+            const allButtons = document.querySelectorAll('.option-btn');
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            const feedbackElement = document.getElementById('feedback');
+            
+            if (selected.text === currentQuestion.text) {
+                // CORRECT
+                button.classList.add('correct');
+                correctAnswers++;
+                streak++;
+                
+                if (streak > maxStreak) {
+                    maxStreak = streak;
+                }
+                
+                const points = 10 + (streak > 1 ? (streak - 1) * 5 : 0);
+                score += points;
+                
+                let feedbackHTML = `✅ <strong>BRAVO!</strong><br>`;
+                feedbackHTML += `C'est bien: <strong>${currentQuestion.text}</strong><br>`;
+                feedbackHTML += `+${points} points`;
+                
+                if (streak > 2) {
+                    feedbackHTML += `<br>⭐ Série de ${streak}! Continue!`;
+                }
+                
+                feedbackElement.innerHTML = feedbackHTML;
+                feedbackElement.className = 'feedback correct';
+                
+                document.getElementById('score').textContent = score;
+                document.getElementById('streak').textContent = streak;
+                
+                setTimeout(() => nextQuestion(), 2000);
+                
+            } else {
+                // INCORRECT
+                button.classList.add('wrong');
+                wrongAnswers++;
+                streak = 0;
+                lives--;
+                
+                updateLives();
+                
+                // Montrer la bonne réponse
+                allButtons.forEach(btn => {
+                    if (btn.textContent === currentQuestion.text) {
+                        btn.classList.add('correct');
+                    }
+                });
+                
+                let feedbackHTML = `❌ <strong>Pas tout à fait...</strong><br>`;
+                feedbackHTML += `La bonne réponse: <strong>${currentQuestion.text}</strong>`;
+                
+                feedbackElement.innerHTML = feedbackHTML;
+                feedbackElement.className = 'feedback wrong';
+                
+                document.getElementById('streak').textContent = '0';
+                
+                if (lives <= 0) {
+                    setTimeout(() => endGame(), 2500);
+                } else {
+                    setTimeout(() => nextQuestion(), 2500);
+                }
+            }
+        }
+
+        function endGame() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'block';
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('correctCount').textContent = correctAnswers;
+            document.getElementById('wrongCount').textContent = wrongAnswers;
+            
+            const totalAnswers = correctAnswers + wrongAnswers;
+            const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            document.getElementById('maxStreak').textContent = maxStreak;
+            
+            let message = '';
+            if (accuracy >= 90) {
+                message = '🌟 PARFAIT! Tu maîtrises l\'heure! 🌟';
+            } else if (accuracy >= 75) {
+                message = '🎉 EXCELLENT! Très bon niveau! 🎉';
+            } else if (accuracy >= 60) {
+                message = '👍 BIEN! Continue à pratiquer! 👍';
+            } else if (accuracy >= 40) {
+                message = '😊 PAS MAL! Tu progresses! 😊';
+            } else {
+                message = '💪 COURAGE! Révise l\'heure! 💪';
+            }
+            
+            document.getElementById('finalMessage').textContent = message;
+        }
+
+        function restartGame() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
