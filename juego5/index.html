@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Les Verbes Pronominaux - Jeu de Conjugaison</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #f5576c;
+            margin-bottom: 10px;
+            font-size: 3em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 1.3em;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .level-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .level-card h3 {
+            color: #f5576c;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .level-card ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+
+        .level-card li {
+            padding: 8px 0;
+            font-size: 1.1em;
+        }
+
+        .level-card li:before {
+            content: "✓ ";
+            color: #38ef7d;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        /* Game Info */
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            border-radius: 15px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin: 10px;
+        }
+
+        .info-value {
+            display: block;
+            font-size: 1.8em;
+            color: #f5576c;
+            margin-top: 5px;
+        }
+
+        /* Question Area */
+        .question-container {
+            background: linear-gradient(135deg, #fff5f8 0%, #ffe6f0 100%);
+            border: 3px solid #f5576c;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            min-height: 300px;
+        }
+
+        .character {
+            text-align: center;
+            font-size: 6em;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-25px); }
+        }
+
+        .question-text {
+            font-size: 2em;
+            color: #333;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+
+        .verb-highlight {
+            color: #f5576c;
+            background: rgba(245, 87, 108, 0.1);
+            padding: 5px 15px;
+            border-radius: 10px;
+        }
+
+        .pronoun-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 15px 5px;
+        }
+
+        /* Options */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .option-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 25px 20px;
+            font-size: 1.3em;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            animation: celebrate 0.6s;
+        }
+
+        .option-btn.wrong {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            animation: shake 0.6s;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.15) rotate(-8deg); }
+            75% { transform: scale(1.15) rotate(8deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-12px); }
+            75% { transform: translateX(12px); }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 35px;
+            background: #e0e0e0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* Lives */
+        .lives-display {
+            text-align: center;
+            font-size: 2.8em;
+            margin-bottom: 20px;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            margin-top: 25px;
+            min-height: 120px;
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: rgba(56, 239, 125, 0.15);
+            border: 3px solid #38ef7d;
+            color: #11998e;
+        }
+
+        .feedback.wrong {
+            background: rgba(235, 51, 73, 0.15);
+            border: 3px solid #eb3349;
+            color: #eb3349;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            font-size: 0.85em;
+            color: #666;
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.4em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Game Over */
+        .game-over {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .final-score {
+            font-size: 4.5em;
+            color: #f5576c;
+            margin: 25px 0;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 35px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.2em;
+            color: #f5576c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- START SCREEN -->
+        <div id="startScreen" class="start-screen">
+            <h1>🪞 LES VERBES PRONOMINAUX 🪞</h1>
+            <p class="subtitle">
+                Conjugue correctement les verbes pronominaux!<br>
+                Attention aux pronoms: me, te, se, nous, vous, se
+            </p>
+
+            <div class="level-grid">
+                <div class="level-card">
+                    <h3>😊 FACILE</h3>
+                    <ul>
+                        <li>4 vies</li>
+                        <li>15 questions</li>
+                        <li>Je, tu, il/elle</li>
+                        <li>3 options</li>
+                        <li>Parfait pour débuter!</li>
+                    </ul>
+                    <button class="btn" onclick="startGame('facile')" style="width: 100%; margin-top: 20px;">Commencer</button>
+                </div>
+
+                <div class="level-card">
+                    <h3>😐 MOYEN</h3>
+                    <ul>
+                        <li>3 vies</li>
+                        <li>20 questions</li>
+                        <li>Tous les pronoms</li>
+                        <li>4 options</li>
+                        <li>Un bon challenge!</li>
+                    </ul>
+                    <button class="btn" onclick="startGame('moyen')" style="width: 100%; margin-top: 20px;">Commencer</button>
+                </div>
+
+                <div class="level-card">
+                    <h3>😤 DIFFICILE</h3>
+                    <ul>
+                        <li>2 vies</li>
+                        <li>25 questions</li>
+                        <li>Tous les verbes</li>
+                        <li>4 options</li>
+                        <li>Pour les experts!</li>
+                    </ul>
+                    <button class="btn" onclick="startGame('difficile')" style="width: 100%; margin-top: 20px;">Commencer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="gameScreen" style="display: none;">
+            <h1>🪞 LES VERBES PRONOMINAUX 🪞</h1>
+
+            <div class="game-info">
+                <div class="info-item">
+                    🏆 Score
+                    <span class="info-value" id="score">0</span>
+                </div>
+                <div class="info-item">
+                    📊 Niveau
+                    <span class="info-value" id="difficulty">-</span>
+                </div>
+                <div class="info-item">
+                    ⭐ Série
+                    <span class="info-value" id="streak">0</span>
+                </div>
+            </div>
+
+            <div class="lives-display" id="lives"></div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar">
+                    <span id="progressText">1/15</span>
+                </div>
+            </div>
+
+            <div class="question-container">
+                <div class="character" id="character">😴</div>
+                <div class="question-text" id="questionText">
+                    <span class="pronoun-badge" id="pronoun">Je</span><br>
+                    <span class="verb-highlight" id="verbInfinitive">(se réveiller)</span>
+                </div>
+            </div>
+
+            <div class="options-grid" id="optionsGrid"></div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- GAME OVER SCREEN -->
+        <div id="gameOverScreen" class="game-over" style="display: none;">
+            <h1>🎮 PARTIE TERMINÉE! 🎮</h1>
+            
+            <div class="final-score">
+                <span id="finalScore">0</span> points
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">✅ Bonnes réponses</div>
+                    <div class="stat-value" id="correctCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">❌ Erreurs</div>
+                    <div class="stat-value" id="wrongCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">🎯 Précision</div>
+                    <div class="stat-value" id="accuracy">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">⭐ Meilleure série</div>
+                    <div class="stat-value" id="maxStreak">0</div>
+                </div>
+            </div>
+
+            <p id="finalMessage" style="font-size: 1.6em; margin: 25px 0; font-weight: bold; color: #f5576c;"></p>
+
+            <button class="btn" onclick="restartGame()">🔄 Rejouer</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de données des verbes pronominaux
+        const verbsDatabase = {
+            facile: [
+                // JE
+                { pronoun: "Je", infinitive: "se réveiller", correct: "me réveille", emoji: "😴", wrongOptions: ["te réveilles", "se réveille"] },
+                { pronoun: "Je", infinitive: "se lever", correct: "me lève", emoji: "🛏️", wrongOptions: ["te lèves", "se lève"] },
+                { pronoun: "Je", infinitive: "se doucher", correct: "me douche", emoji: "🚿", wrongOptions: ["te douches", "se douche"] },
+                { pronoun: "Je", infinitive: "s'habiller", correct: "m'habille", emoji: "👕", wrongOptions: ["t'habilles", "s'habille"] },
+                { pronoun: "Je", infinitive: "se brosser les dents", correct: "me brosse les dents", emoji: "🪥", wrongOptions: ["te brosses les dents", "se brosse les dents"] },
+                { pronoun: "Je", infinitive: "se coucher", correct: "me couche", emoji: "😴", wrongOptions: ["te couches", "se couche"] },
+                // TU
+                { pronoun: "Tu", infinitive: "se réveiller", correct: "te réveilles", emoji: "😴", wrongOptions: ["me réveille", "se réveille"] },
+                { pronoun: "Tu", infinitive: "se lever", correct: "te lèves", emoji: "🛏️", wrongOptions: ["me lève", "se lève"] },
+                { pronoun: "Tu", infinitive: "se doucher", correct: "te douches", emoji: "🚿", wrongOptions: ["me douche", "se douche"] },
+                { pronoun: "Tu", infinitive: "s'habiller", correct: "t'habilles", emoji: "👕", wrongOptions: ["m'habille", "s'habille"] },
+                // IL/ELLE
+                { pronoun: "Il", infinitive: "se réveiller", correct: "se réveille", emoji: "😴", wrongOptions: ["me réveille", "te réveilles"] },
+                { pronoun: "Elle", infinitive: "se lever", correct: "se lève", emoji: "🛏️", wrongOptions: ["me lève", "te lèves"] },
+                { pronoun: "Il", infinitive: "se doucher", correct: "se douche", emoji: "🚿", wrongOptions: ["me douche", "te douches"] },
+                { pronoun: "Elle", infinitive: "s'habiller", correct: "s'habille", emoji: "👗", wrongOptions: ["m'habille", "t'habilles"] },
+                { pronoun: "Il", infinitive: "se coucher", correct: "se couche", emoji: "😴", wrongOptions: ["me couche", "te couches"] }
+            ],
+            moyen: [
+                // Tous les pronoms
+                { pronoun: "Je", infinitive: "se laver", correct: "me lave", emoji: "🧼", wrongOptions: ["te laves", "se lave", "nous lavons"] },
+                { pronoun: "Tu", infinitive: "se peigner", correct: "te peignes", emoji: "💇", wrongOptions: ["me peigne", "se peigne", "vous peignez"] },
+                { pronoun: "Il", infinitive: "se raser", correct: "se rase", emoji: "🪒", wrongOptions: ["me rase", "te rases", "nous rasons"] },
+                { pronoun: "Nous", infinitive: "se réveiller", correct: "nous réveillons", emoji: "😴", wrongOptions: ["me réveille", "vous réveillez", "se réveillent"] },
+                { pronoun: "Vous", infinitive: "se lever", correct: "vous levez", emoji: "🛏️", wrongOptions: ["te lèves", "nous levons", "se lèvent"] },
+                { pronoun: "Ils", infinitive: "se doucher", correct: "se douchent", emoji: "🚿", wrongOptions: ["se douche", "nous douchons", "vous douchez"] },
+                { pronoun: "Nous", infinitive: "s'habiller", correct: "nous habillons", emoji: "👔", wrongOptions: ["m'habille", "vous habillez", "s'habillent"] },
+                { pronoun: "Vous", infinitive: "se brosser les dents", correct: "vous brossez les dents", emoji: "🪥", wrongOptions: ["te brosses les dents", "nous brossons les dents", "se brossent les dents"] },
+                { pronoun: "Elles", infinitive: "se coucher", correct: "se couchent", emoji: "😴", wrongOptions: ["se couche", "nous couchons", "vous couchez"] },
+                { pronoun: "Nous", infinitive: "se promener", correct: "nous promenons", emoji: "🚶", wrongOptions: ["me promène", "vous promenez", "se promènent"] },
+                { pronoun: "Vous", infinitive: "s'amuser", correct: "vous amusez", emoji: "🎉", wrongOptions: ["t'amuses", "nous amusons", "s'amusent"] },
+                { pronoun: "Je", infinitive: "se préparer", correct: "me prépare", emoji: "💼", wrongOptions: ["te prépares", "se prépare", "nous préparons"] },
+                { pronoun: "Tu", infinitive: "se dépêcher", correct: "te dépêches", emoji: "⏰", wrongOptions: ["me dépêche", "se dépêche", "vous dépêchez"] },
+                { pronoun: "Il", infinitive: "s'appeler", correct: "s'appelle", emoji: "📛", wrongOptions: ["m'appelle", "t'appelles", "nous appelons"] },
+                { pronoun: "Elles", infinitive: "se reposer", correct: "se reposent", emoji: "😌", wrongOptions: ["se repose", "nous reposons", "vous reposez"] }
+            ],
+            difficile: [
+                // Tous les verbes, tous les pronoms
+                { pronoun: "Je", infinitive: "s'ennuyer", correct: "m'ennuie", emoji: "😑", wrongOptions: ["t'ennuies", "s'ennuie", "nous ennuyons"] },
+                { pronoun: "Tu", infinitive: "se souvenir", correct: "te souviens", emoji: "🤔", wrongOptions: ["me souviens", "se souvient", "vous souvenez"] },
+                { pronoun: "Il", infinitive: "se sentir", correct: "se sent", emoji: "😊", wrongOptions: ["me sens", "te sens", "nous sentons"] },
+                { pronoun: "Nous", infinitive: "se regarder", correct: "nous regardons", emoji: "👀", wrongOptions: ["me regarde", "vous regardez", "se regardent"] },
+                { pronoun: "Vous", infinitive: "se parler", correct: "vous parlez", emoji: "💬", wrongOptions: ["te parles", "nous parlons", "se parlent"] },
+                { pronoun: "Elles", infinitive: "se téléphoner", correct: "se téléphonent", emoji: "📞", wrongOptions: ["se téléphone", "nous téléphonons", "vous téléphonez"] },
+                { pronoun: "Je", infinitive: "se promener", correct: "me promène", emoji: "🚶", wrongOptions: ["te promènes", "se promène", "nous promenons"] },
+                { pronoun: "Tu", infinitive: "s'inquiéter", correct: "t'inquiètes", emoji: "😰", wrongOptions: ["m'inquiète", "s'inquiète", "vous inquiétez"] },
+                { pronoun: "Elle", infinitive: "se maquiller", correct: "se maquille", emoji: "💄", wrongOptions: ["me maquille", "te maquilles", "nous maquillons"] },
+                { pronoun: "Nous", infinitive: "se retrouver", correct: "nous retrouvons", emoji: "👥", wrongOptions: ["me retrouve", "vous retrouvez", "se retrouvent"] },
+                { pronoun: "Vous", infinitive: "se disputer", correct: "vous disputez", emoji: "😠", wrongOptions: ["te disputes", "nous disputons", "se disputent"] },
+                { pronoun: "Ils", infinitive: "s'occuper de", correct: "s'occupent de", emoji: "👶", wrongOptions: ["s'occupe de", "nous occupons de", "vous occupez de"] },
+                { pronoun: "Je", infinitive: "se déshabiller", correct: "me déshabille", emoji: "👔", wrongOptions: ["te déshabilles", "se déshabille", "nous déshabillons"] },
+                { pronoun: "Tu", infinitive: "se coiffer", correct: "te coiffes", emoji: "💇", wrongOptions: ["me coiffe", "se coiffe", "vous coiffez"] },
+                { pronoun: "Il", infinitive: "se réveiller", correct: "se réveille", emoji: "😴", wrongOptions: ["me réveille", "te réveilles", "nous réveillons"] },
+                { pronoun: "Nous", infinitive: "se détendre", correct: "nous détendons", emoji: "😌", wrongOptions: ["me détends", "vous détendez", "se détendent"] },
+                { pronoun: "Vous", infinitive: "se rencontrer", correct: "vous rencontrez", emoji: "🤝", wrongOptions: ["te rencontres", "nous rencontrons", "se rencontrent"] },
+                { pronoun: "Elles", infinitive: "se lever", correct: "se lèvent", emoji: "🛏️", wrongOptions: ["se lève", "nous levons", "vous levez"] }
+            ]
+        };
+
+        // Variables du jeu
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let lives = 3;
+        let currentRound = 0;
+        let maxRounds = 20;
+        let difficulty = 'moyen';
+        let correctAnswers = 0;
+        let wrongAnswers = 0;
+        let gameQuestions = [];
+        let currentQuestion = null;
+        let optionsCount = 4;
+
+        function startGame(level) {
+            difficulty = level;
+            
+            // Réinitialisation
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            currentRound = 0;
+            correctAnswers = 0;
+            wrongAnswers = 0;
+            
+            // Configuration selon difficulté
+            if (level === 'facile') {
+                lives = 4;
+                maxRounds = 15;
+                optionsCount = 3;
+            } else if (level === 'moyen') {
+                lives = 3;
+                maxRounds = 20;
+                optionsCount = 4;
+            } else {
+                lives = 2;
+                maxRounds = 25;
+                optionsCount = 4;
+            }
+            
+            // Préparer les questions
+            prepareQuestions();
+            
+            // Affichage
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('gameOverScreen').style.display = 'none';
+            
+            document.getElementById('difficulty').textContent = level.charAt(0).toUpperCase() + level.slice(1);
+            document.getElementById('score').textContent = '0';
+            document.getElementById('streak').textContent = '0';
+            
+            updateLives();
+            nextQuestion();
+        }
+
+        function prepareQuestions() {
+            const pool = verbsDatabase[difficulty];
+            gameQuestions = [...pool].sort(() => Math.random() - 0.5).slice(0, maxRounds);
+        }
+
+        function updateLives() {
+            const maxLives = difficulty === 'facile' ? 4 : difficulty === 'moyen' ? 3 : 2;
+            document.getElementById('lives').innerHTML = '❤️'.repeat(lives) + '🖤'.repeat(maxLives - lives);
+        }
+
+        function nextQuestion() {
+            if (currentRound >= maxRounds || lives <= 0) {
+                endGame();
+                return;
+            }
+
+            currentQuestion = gameQuestions[currentRound];
+            currentRound++;
+            
+            // Mise à jour progression
+            const progress = (currentRound / maxRounds) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = currentRound + '/' + maxRounds;
+            
+            // Afficher la question
+            document.getElementById('character').textContent = currentQuestion.emoji;
+            document.getElementById('pronoun').textContent = currentQuestion.pronoun;
+            document.getElementById('verbInfinitive').textContent = currentQuestion.infinitive;
+            
+            // Créer les options
+            createOptions();
+            
+            // Reset feedback
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+        }
+
+        function createOptions() {
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+            
+            // Créer les options
+            let options = [currentQuestion.correct, ...currentQuestion.wrongOptions.slice(0, optionsCount - 1)];
+            
+            // Mélanger
+            options = options.sort(() => Math.random() - 0.5);
+            
+            // Créer les boutons
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = currentQuestion.pronoun + ' ' + option;
+                btn.onclick = () => checkAnswer(option, btn);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, button) {
+            const allButtons = document.querySelectorAll('.option-btn');
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            const feedbackElement = document.getElementById('feedback');
+            
+            if (selected === currentQuestion.correct) {
+                // CORRECT
+                button.classList.add('correct');
+                correctAnswers++;
+                streak++;
+                
+                if (streak > maxStreak) {
+                    maxStreak = streak;
+                }
+                
+                const points = 10 + (streak > 1 ? (streak - 1) * 5 : 0);
+                score += points;
+                
+                let feedbackHTML = `✅ <strong>PARFAIT!</strong><br>`;
+                feedbackHTML += `<strong>${currentQuestion.pronoun} ${currentQuestion.correct}</strong><br>`;
+                feedbackHTML += `+${points} points`;
+                
+                if (streak > 2) {
+                    feedbackHTML += `<br>⭐ Série de ${streak}! Continue!`;
+                }
+                
+                feedbackElement.innerHTML = feedbackHTML;
+                feedbackElement.className = 'feedback correct';
+                
+                document.getElementById('score').textContent = score;
+                document.getElementById('streak').textContent = streak;
+                
+                setTimeout(() => nextQuestion(), 2000);
+                
+            } else {
+                // INCORRECT
+                button.classList.add('wrong');
+                wrongAnswers++;
+                streak = 0;
+                lives--;
+                
+                updateLives();
+                
+                // Montrer la bonne réponse
+                allButtons.forEach(btn => {
+                    if (btn.textContent === currentQuestion.pronoun + ' ' + currentQuestion.correct) {
+                        btn.classList.add('correct');
+                    }
+                });
+                
+                let feedbackHTML = `❌ <strong>Oups!</strong><br>`;
+                feedbackHTML += `La bonne réponse: <strong>${currentQuestion.pronoun} ${currentQuestion.correct}</strong>`;
+                feedbackHTML += `<div class="explanation">💡 Rappel: ${currentQuestion.pronoun.toLowerCase()} + pronom réfléchi</div>`;
+                
+                feedbackElement.innerHTML = feedbackHTML;
+                feedbackElement.className = 'feedback wrong';
+                
+                document.getElementById('streak').textContent = '0';
+                
+                if (lives <= 0) {
+                    setTimeout(() => endGame(), 2500);
+                } else {
+                    setTimeout(() => nextQuestion(), 2500);
+                }
+            }
+        }
+
+        function endGame() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'block';
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('correctCount').textContent = correctAnswers;
+            document.getElementById('wrongCount').textContent = wrongAnswers;
+            
+            const totalAnswers = correctAnswers + wrongAnswers;
+            const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            document.getElementById('maxStreak').textContent = maxStreak;
+            
+            let message = '';
+            if (accuracy >= 90) {
+                message = '🌟 PARFAIT! Tu maîtrises les verbes pronominaux! 🌟';
+            } else if (accuracy >= 75) {
+                message = '🎉 EXCELLENT! Très bon niveau! 🎉';
+            } else if (accuracy >= 60) {
+                message = '👍 BIEN! Continue à pratiquer! 👍';
+            } else if (accuracy >= 40) {
+                message = '😊 PAS MAL! Tu progresses! 😊';
+            } else {
+                message = '💪 COURAGE! Révise les conjugaisons! 💪';
+            }
+            
+            document.getElementById('finalMessage').textContent = message;
+        }
+
+        function restartGame() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
