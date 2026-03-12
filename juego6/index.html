@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faire ou Jouer? - Jeu des Activités</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #43e97b;
+            margin-bottom: 10px;
+            font-size: 3em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 1.3em;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .explanation-box {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px auto;
+            max-width: 900px;
+            text-align: left;
+        }
+
+        .explanation-box h3 {
+            color: #43e97b;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .rule-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .rule-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #43e97b;
+        }
+
+        .rule-card h4 {
+            color: #43e97b;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .rule-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .rule-card li {
+            padding: 8px 0;
+            font-size: 1.1em;
+        }
+
+        .rule-card li:before {
+            content: "→ ";
+            color: #43e97b;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .level-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .level-card h3 {
+            color: #43e97b;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .level-card ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+
+        .level-card li {
+            padding: 8px 0;
+            font-size: 1.1em;
+        }
+
+        .level-card li:before {
+            content: "✓ ";
+            color: #38ef7d;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        /* Game Info */
+        .game-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            border-radius: 15px;
+            flex-wrap: wrap;
+        }
+
+        .info-item {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin: 10px;
+        }
+
+        .info-value {
+            display: block;
+            font-size: 1.8em;
+            color: #43e97b;
+            margin-top: 5px;
+        }
+
+        /* Question Area */
+        .question-container {
+            background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+            border: 3px solid #43e97b;
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            min-height: 350px;
+        }
+
+        .activity-display {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .activity-emoji {
+            font-size: 8em;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-25px); }
+        }
+
+        .activity-text {
+            font-size: 2.2em;
+            color: #333;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .question-text {
+            font-size: 1.8em;
+            color: #43e97b;
+            font-weight: bold;
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        /* Options */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .option-btn {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            border: none;
+            padding: 30px 20px;
+            font-size: 1.4em;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            animation: celebrate 0.6s;
+        }
+
+        .option-btn.wrong {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            animation: shake 0.6s;
+        }
+
+        @keyframes celebrate {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.15) rotate(-8deg); }
+            75% { transform: scale(1.15) rotate(8deg); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-12px); }
+            75% { transform: translateX(12px); }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 35px;
+            background: #e0e0e0;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* Lives */
+        .lives-display {
+            text-align: center;
+            font-size: 2.8em;
+            margin-bottom: 20px;
+        }
+
+        /* Feedback */
+        .feedback {
+            text-align: center;
+            margin-top: 25px;
+            min-height: 120px;
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .feedback.correct {
+            background: rgba(56, 239, 125, 0.15);
+            border: 3px solid #38ef7d;
+            color: #11998e;
+        }
+
+        .feedback.wrong {
+            background: rgba(235, 51, 73, 0.15);
+            border: 3px solid #eb3349;
+            color: #eb3349;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            font-size: 0.85em;
+            color: #666;
+            font-weight: normal;
+            font-style: italic;
+        }
+
+        /* Buttons */
+        .btn {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            border: none;
+            padding: 18px 45px;
+            font-size: 1.4em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        /* Game Over */
+        .game-over {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .final-score {
+            font-size: 4.5em;
+            color: #43e97b;
+            margin: 25px 0;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 35px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.2em;
+            color: #43e97b;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- START SCREEN -->
+        <div id="startScreen" class="start-screen">
+            <h1>⚽ FAIRE ou JOUER? 🎸</h1>
+            <p class="subtitle">
+                Apprends à différencier FAIRE et JOUER!<br>
+                Choisis la bonne structure pour chaque activité!
+            </p>
+
+            <div class="explanation-box">
+                <h3>📚 Les règles importantes:</h3>
+                <div class="rule-grid">
+                    <div class="rule-card">
+                        <h4>🎸 JOUER DE + instrument</h4>
+                        <ul>
+                            <li>jouer <strong>de la</strong> guitare</li>
+                            <li>jouer <strong>du</strong> piano</li>
+                            <li>jouer <strong>de la</strong> flûte</li>
+                            <li>jouer <strong>de l'</strong>accordéon</li>
+                        </ul>
+                    </div>
+                    <div class="rule-card">
+                        <h4>⚽ JOUER À/AU + sport/jeu</h4>
+                        <ul>
+                            <li>jouer <strong>au</strong> football</li>
+                            <li>jouer <strong>au</strong> tennis</li>
+                            <li>jouer <strong>aux</strong> cartes</li>
+                            <li>jouer <strong>à</strong> cache-cache</li>
+                        </ul>
+                    </div>
+                    <div class="rule-card">
+                        <h4>🏃 FAIRE DU/DE LA + sport</h4>
+                        <ul>
+                            <li>faire <strong>du</strong> sport</li>
+                            <li>faire <strong>du</strong> vélo</li>
+                            <li>faire <strong>de la</strong> natation</li>
+                            <li>faire <strong>de l'</strong>équitation</li>
+                        </ul>
+                    </div>
+                    <div class="rule-card">
+                        <h4>⚠️ ATTENTION!</h4>
+                        <ul>
+                            <li>On dit: faire <strong>du</strong> foot ✅</li>
+                            <li>On dit: jouer <strong>au</strong> foot ✅</li>
+                            <li>Les deux sont corrects!</li>
+                            <li>Mais JAMAIS: jouer du foot ❌</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="level-grid">
+                <div class="level-card">
+                    <h3>😊 FACILE</h3>
+                    <ul>
+                        <li>4 vies</li>
+                        <li>15 questions</li>
+                        <li>Activités basiques</li>
+                        <li>2 options</li>
+                        <li>Parfait pour débuter!</li>
+                    </ul>
+                    <button class="btn" onclick="startGame('facile')" style="width: 100%; margin-top: 20px;">Commencer</button>
+                </div>
+
+                <div class="level-card">
+                    <h3>😐 MOYEN</h3>
+                    <ul>
+                        <li>3 vies</li>
+                        <li>20 questions</li>
+                        <li>Plus d'activités</li>
+                        <li>3 options</li>
+                        <li>Un bon challenge!</li>
+                    </ul>
+                    <button class="btn" onclick="startGame('moyen')" style="width: 100%; margin-top: 20px;">Commencer</button>
+                </div>
+
+                <div class="level-card">
+                    <h3>😤 DIFFICILE</h3>
+                    <ul>
+                        <li>2 vies</li>
+                        <li>25 questions</li>
+                        <li>Toutes les activités</li>
+                        <li>4 options</li>
+                        <li>Pour les experts!</li>
+                    </ul>
+                    <button class="btn" onclick="startGame('difficile')" style="width: 100%; margin-top: 20px;">Commencer</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAME SCREEN -->
+        <div id="gameScreen" style="display: none;">
+            <h1>⚽ FAIRE ou JOUER? 🎸</h1>
+
+            <div class="game-info">
+                <div class="info-item">
+                    🏆 Score
+                    <span class="info-value" id="score">0</span>
+                </div>
+                <div class="info-item">
+                    📊 Niveau
+                    <span class="info-value" id="difficulty">-</span>
+                </div>
+                <div class="info-item">
+                    ⭐ Série
+                    <span class="info-value" id="streak">0</span>
+                </div>
+            </div>
+
+            <div class="lives-display" id="lives"></div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar">
+                    <span id="progressText">1/15</span>
+                </div>
+            </div>
+
+            <div class="question-container">
+                <div class="activity-display">
+                    <div class="activity-emoji" id="activityEmoji">⚽</div>
+                    <div class="activity-text" id="activityText">football</div>
+                </div>
+                <div class="question-text">Comment on dit?</div>
+                <div class="options-grid" id="optionsGrid"></div>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- GAME OVER SCREEN -->
+        <div id="gameOverScreen" class="game-over" style="display: none;">
+            <h1>🎮 PARTIE TERMINÉE! 🎮</h1>
+            
+            <div class="final-score">
+                <span id="finalScore">0</span> points
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">✅ Bonnes réponses</div>
+                    <div class="stat-value" id="correctCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">❌ Erreurs</div>
+                    <div class="stat-value" id="wrongCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">🎯 Précision</div>
+                    <div class="stat-value" id="accuracy">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">⭐ Meilleure série</div>
+                    <div class="stat-value" id="maxStreak">0</div>
+                </div>
+            </div>
+
+            <p id="finalMessage" style="font-size: 1.6em; margin: 25px 0; font-weight: bold; color: #43e97b;"></p>
+
+            <button class="btn" onclick="restartGame()">🔄 Rejouer</button>
+        </div>
+    </div>
+
+    <script>
+        // Base de données des activités
+        const activitiesDatabase = {
+            facile: [
+                // Instruments (JOUER DE)
+                { activity: "guitare", emoji: "🎸", correct: "jouer de la guitare", type: "instrument", wrongOptions: ["faire de la guitare"] },
+                { activity: "piano", emoji: "🎹", correct: "jouer du piano", type: "instrument", wrongOptions: ["faire du piano"] },
+                { activity: "violon", emoji: "🎻", correct: "jouer du violon", type: "instrument", wrongOptions: ["faire du violon"] },
+                { activity: "batterie", emoji: "🥁", correct: "jouer de la batterie", type: "instrument", wrongOptions: ["faire de la batterie"] },
+                // Sports collectifs (JOUER À/AU)
+                { activity: "football", emoji: "⚽", correct: "jouer au football", type: "sport collectif", wrongOptions: ["faire au football"] },
+                { activity: "basketball", emoji: "🏀", correct: "jouer au basketball", type: "sport collectif", wrongOptions: ["faire au basketball"] },
+                { activity: "tennis", emoji: "🎾", correct: "jouer au tennis", type: "sport collectif", wrongOptions: ["faire au tennis"] },
+                { activity: "volleyball", emoji: "🏐", correct: "jouer au volleyball", type: "sport collectif", wrongOptions: ["faire au volleyball"] },
+                // Sports individuels (FAIRE DU/DE LA)
+                { activity: "natation", emoji: "🏊", correct: "faire de la natation", type: "sport individuel", wrongOptions: ["jouer à la natation"] },
+                { activity: "vélo", emoji: "🚴", correct: "faire du vélo", type: "sport individuel", wrongOptions: ["jouer au vélo"] },
+                { activity: "ski", emoji: "⛷️", correct: "faire du ski", type: "sport individuel", wrongOptions: ["jouer au ski"] },
+                { activity: "danse", emoji: "💃", correct: "faire de la danse", type: "sport individuel", wrongOptions: ["jouer à la danse"] },
+                { activity: "yoga", emoji: "🧘", correct: "faire du yoga", type: "sport individuel", wrongOptions: ["jouer au yoga"] },
+                { activity: "jogging", emoji: "🏃", correct: "faire du jogging", type: "sport individuel", wrongOptions: ["jouer au jogging"] },
+                { activity: "escalade", emoji: "🧗", correct: "faire de l'escalade", type: "sport individuel", wrongOptions: ["jouer à l'escalade"] }
+            ],
+            moyen: [
+                // Instruments
+                { activity: "flûte", emoji: "🎶", correct: "jouer de la flûte", type: "instrument", wrongOptions: ["faire de la flûte", "jouer à la flûte"] },
+                { activity: "trompette", emoji: "🎺", correct: "jouer de la trompette", type: "instrument", wrongOptions: ["faire de la trompette", "jouer à la trompette"] },
+                { activity: "saxophone", emoji: "🎷", correct: "jouer du saxophone", type: "instrument", wrongOptions: ["faire du saxophone", "jouer au saxophone"] },
+                // Sports avec "faire" ET "jouer" possibles
+                { activity: "foot", emoji: "⚽", correct: "faire du foot", type: "sport", wrongOptions: ["faire au foot", "jouer du foot"], alsoCorrect: "jouer au foot" },
+                { activity: "basket", emoji: "🏀", correct: "faire du basket", type: "sport", wrongOptions: ["faire au basket", "jouer du basket"], alsoCorrect: "jouer au basket" },
+                // Jeux (JOUER À/AU/AUX)
+                { activity: "cartes", emoji: "🃏", correct: "jouer aux cartes", type: "jeu", wrongOptions: ["faire aux cartes", "jouer des cartes"] },
+                { activity: "échecs", emoji: "♟️", correct: "jouer aux échecs", type: "jeu", wrongOptions: ["faire aux échecs", "jouer des échecs"] },
+                { activity: "cache-cache", emoji: "🙈", correct: "jouer à cache-cache", type: "jeu", wrongOptions: ["faire à cache-cache", "jouer du cache-cache"] },
+                // Sports individuels
+                { activity: "équitation", emoji: "🏇", correct: "faire de l'équitation", type: "sport individuel", wrongOptions: ["jouer à l'équitation", "jouer de l'équitation"] },
+                { activity: "gymnastique", emoji: "🤸", correct: "faire de la gymnastique", type: "sport individuel", wrongOptions: ["jouer à la gymnastique", "jouer de la gymnastique"] },
+                { activity: "musculation", emoji: "🏋️", correct: "faire de la musculation", type: "sport individuel", wrongOptions: ["jouer à la musculation", "jouer de la musculation"] },
+                { activity: "athlétisme", emoji: "🏃", correct: "faire de l'athlétisme", type: "sport individuel", wrongOptions: ["jouer à l'athlétisme", "jouer de l'athlétisme"] },
+                // Sports de combat
+                { activity: "boxe", emoji: "🥊", correct: "faire de la boxe", type: "sport de combat", wrongOptions: ["jouer à la boxe", "jouer de la boxe"] },
+                { activity: "judo", emoji: "🥋", correct: "faire du judo", type: "sport de combat", wrongOptions: ["jouer au judo", "jouer du judo"] },
+                { activity: "karaté", emoji: "🥋", correct: "faire du karaté", type: "sport de combat", wrongOptions: ["jouer au karaté", "jouer du karaté"] }
+            ],
+            difficile: [
+                // Tous types mélangés
+                { activity: "accordéon", emoji: "🪗", correct: "jouer de l'accordéon", type: "instrument", wrongOptions: ["faire de l'accordéon", "jouer à l'accordéon", "jouer au accordéon"] },
+                { activity: "harmonica", emoji: "🎵", correct: "jouer de l'harmonica", type: "instrument", wrongOptions: ["faire de l'harmonica", "jouer à l'harmonica", "jouer au harmonica"] },
+                { activity: "rugby", emoji: "🏉", correct: "jouer au rugby", type: "sport collectif", wrongOptions: ["faire au rugby", "jouer du rugby", "faire du rugby"] },
+                { activity: "hockey", emoji: "🏒", correct: "jouer au hockey", type: "sport collectif", wrongOptions: ["faire au hockey", "jouer du hockey", "faire du hockey"] },
+                { activity: "planche à voile", emoji: "🏄", correct: "faire de la planche à voile", type: "sport", wrongOptions: ["jouer à la planche à voile", "jouer de la planche à voile", "faire à la planche à voile"] },
+                { activity: "plongée", emoji: "🤿", correct: "faire de la plongée", type: "sport", wrongOptions: ["jouer à la plongée", "jouer de la plongée", "faire à la plongée"] },
+                { activity: "course", emoji: "🏃", correct: "faire de la course", type: "sport", wrongOptions: ["jouer à la course", "jouer de la course", "faire à la course"] },
+                { activity: "randonnée", emoji: "🥾", correct: "faire de la randonnée", type: "sport", wrongOptions: ["jouer à la randonnée", "jouer de la randonnée", "faire à la randonnée"] },
+                { activity: "jeux vidéo", emoji: "🎮", correct: "jouer aux jeux vidéo", type: "jeu", wrongOptions: ["faire aux jeux vidéo", "jouer des jeux vidéo", "faire des jeux vidéo"] },
+                { activity: "pétanque", emoji: "🎯", correct: "jouer à la pétanque", type: "jeu", wrongOptions: ["faire de la pétanque", "jouer de la pétanque", "faire à la pétanque"] },
+                { activity: "patin à glace", emoji: "⛸️", correct: "faire du patin à glace", type: "sport", wrongOptions: ["jouer au patin à glace", "jouer du patin à glace", "faire au patin à glace"] },
+                { activity: "snowboard", emoji: "🏂", correct: "faire du snowboard", type: "sport", wrongOptions: ["jouer au snowboard", "jouer du snowboard", "faire au snowboard"] },
+                { activity: "aviron", emoji: "🚣", correct: "faire de l'aviron", type: "sport", wrongOptions: ["jouer à l'aviron", "jouer de l'aviron", "faire à l'aviron"] },
+                { activity: "voile", emoji: "⛵", correct: "faire de la voile", type: "sport", wrongOptions: ["jouer à la voile", "jouer de la voile", "faire à la voile"] },
+                { activity: "ping-pong", emoji: "🏓", correct: "jouer au ping-pong", type: "sport", wrongOptions: ["faire au ping-pong", "jouer du ping-pong", "faire du ping-pong"] }
+            ]
+        };
+
+        // Variables du jeu
+        let score = 0;
+        let streak = 0;
+        let maxStreak = 0;
+        let lives = 3;
+        let currentRound = 0;
+        let maxRounds = 20;
+        let difficulty = 'moyen';
+        let correctAnswers = 0;
+        let wrongAnswers = 0;
+        let gameQuestions = [];
+        let currentQuestion = null;
+        let optionsCount = 3;
+
+        function startGame(level) {
+            difficulty = level;
+            
+            // Réinitialisation
+            score = 0;
+            streak = 0;
+            maxStreak = 0;
+            currentRound = 0;
+            correctAnswers = 0;
+            wrongAnswers = 0;
+            
+            // Configuration selon difficulté
+            if (level === 'facile') {
+                lives = 4;
+                maxRounds = 15;
+                optionsCount = 2;
+            } else if (level === 'moyen') {
+                lives = 3;
+                maxRounds = 20;
+                optionsCount = 3;
+            } else {
+                lives = 2;
+                maxRounds = 25;
+                optionsCount = 4;
+            }
+            
+            // Préparer les questions
+            prepareQuestions();
+            
+            // Affichage
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('gameOverScreen').style.display = 'none';
+            
+            document.getElementById('difficulty').textContent = level.charAt(0).toUpperCase() + level.slice(1);
+            document.getElementById('score').textContent = '0';
+            document.getElementById('streak').textContent = '0';
+            
+            updateLives();
+            nextQuestion();
+        }
+
+        function prepareQuestions() {
+            const pool = activitiesDatabase[difficulty];
+            gameQuestions = [...pool].sort(() => Math.random() - 0.5).slice(0, maxRounds);
+        }
+
+        function updateLives() {
+            const maxLives = difficulty === 'facile' ? 4 : difficulty === 'moyen' ? 3 : 2;
+            document.getElementById('lives').innerHTML = '❤️'.repeat(lives) + '🖤'.repeat(maxLives - lives);
+        }
+
+        function nextQuestion() {
+            if (currentRound >= maxRounds || lives <= 0) {
+                endGame();
+                return;
+            }
+
+            currentQuestion = gameQuestions[currentRound];
+            currentRound++;
+            
+            // Mise à jour progression
+            const progress = (currentRound / maxRounds) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = currentRound + '/' + maxRounds;
+            
+            // Afficher l'activité
+            document.getElementById('activityEmoji').textContent = currentQuestion.emoji;
+            document.getElementById('activityText').textContent = currentQuestion.activity;
+            
+            // Créer les options
+            createOptions();
+            
+            // Reset feedback
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('feedback').className = 'feedback';
+        }
+
+        function createOptions() {
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+            
+            // Créer les options
+            let options = [currentQuestion.correct, ...currentQuestion.wrongOptions.slice(0, optionsCount - 1)];
+            
+            // Mélanger
+            options = options.sort(() => Math.random() - 0.5);
+            
+            // Créer les boutons
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option, btn);
+                optionsGrid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, button) {
+            const allButtons = document.querySelectorAll('.option-btn');
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            const feedbackElement = document.getElementById('feedback');
+            
+            // Vérifier si c'est correct (ou aussi correct dans certains cas)
+            const isCorrect = selected === currentQuestion.correct || 
+                            (currentQuestion.alsoCorrect && selected === currentQuestion.alsoCorrect);
+            
+            if (isCorrect) {
+                // CORRECT
+                button.classList.add('correct');
+                correctAnswers++;
+                streak++;
+                
+                if (streak > maxStreak) {
+                    maxStreak = streak;
+                }
+                
+                const points = 10 + (streak > 1 ? (streak - 1) * 5 : 0);
+                score += points;
+                
+                let feedbackHTML = `✅ <strong>PARFAIT!</strong><br>`;
+                feedbackHTML += `<strong>${selected}</strong><br>`;
+                
+                if (currentQuestion.alsoCorrect && selected !== currentQuestion.correct) {
+                    feedbackHTML += `<div class="explanation">💡 On peut aussi dire: ${currentQuestion.correct}</div>`;
+                } else if (currentQuestion.alsoCorrect) {
+                    feedbackHTML += `<div class="explanation">💡 On peut aussi dire: ${currentQuestion.alsoCorrect}</div>`;
+                }
+                
+                feedbackHTML += `+${points} points`;
+                
+                if (streak > 2) {
+                    feedbackHTML += `<br>⭐ Série de ${streak}! Continue!`;
+                }
+                
+                feedbackElement.innerHTML = feedbackHTML;
+                feedbackElement.className = 'feedback correct';
+                
+                document.getElementById('score').textContent = score;
+                document.getElementById('streak').textContent = streak;
+                
+                setTimeout(() => nextQuestion(), 2500);
+                
+            } else {
+                // INCORRECT
+                button.classList.add('wrong');
+                wrongAnswers++;
+                streak = 0;
+                lives--;
+                
+                updateLives();
+                
+                // Montrer la bonne réponse
+                allButtons.forEach(btn => {
+                    if (btn.textContent === currentQuestion.correct || 
+                        (currentQuestion.alsoCorrect && btn.textContent === currentQuestion.alsoCorrect)) {
+                        btn.classList.add('correct');
+                    }
+                });
+                
+                let feedbackHTML = `❌ <strong>Oups!</strong><br>`;
+                feedbackHTML += `La bonne réponse: <strong>${currentQuestion.correct}</strong>`;
+                
+                if (currentQuestion.alsoCorrect) {
+                    feedbackHTML += `<div class="explanation">💡 On peut aussi dire: ${currentQuestion.alsoCorrect}</div>`;
+                }
+                
+                let explanation = '';
+                if (currentQuestion.type === 'instrument') {
+                    explanation = '🎸 Instrument → JOUER DE';
+                } else if (currentQuestion.type.includes('sport collectif') || currentQuestion.type === 'jeu') {
+                    explanation = '⚽ Sport collectif/Jeu → JOUER À/AU/AUX';
+                } else if (currentQuestion.type.includes('sport')) {
+                    explanation = '🏃 Sport individuel → FAIRE DU/DE LA/DE L\'';
+                }
+                
+                if (explanation) {
+                    feedbackHTML += `<div class="explanation">${explanation}</div>`;
+                }
+                
+                feedbackElement.innerHTML = feedbackHTML;
+                feedbackElement.className = 'feedback wrong';
+                
+                document.getElementById('streak').textContent = '0';
+                
+                if (lives <= 0) {
+                    setTimeout(() => endGame(), 3000);
+                } else {
+                    setTimeout(() => nextQuestion(), 3000);
+                }
+            }
+        }
+
+        function endGame() {
+            document.getElementById('gameScreen').style.display = 'none';
+            document.getElementById('gameOverScreen').style.display = 'block';
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('correctCount').textContent = correctAnswers;
+            document.getElementById('wrongCount').textContent = wrongAnswers;
+            
+            const totalAnswers = correctAnswers + wrongAnswers;
+            const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            document.getElementById('maxStreak').textContent = maxStreak;
+            
+            let message = '';
+            if (accuracy >= 90) {
+                message = '🌟 PARFAIT! Tu maîtrises FAIRE et JOUER! 🌟';
+            } else if (accuracy >= 75) {
+                message = '🎉 EXCELLENT! Très bon niveau! 🎉';
+            } else if (accuracy >= 60) {
+                message = '👍 BIEN! Continue à pratiquer! 👍';
+            } else if (accuracy >= 40) {
+                message = '😊 PAS MAL! Tu progresses! 😊';
+            } else {
+                message = '💪 COURAGE! Révise les règles! 💪';
+            }
+            
+            document.getElementById('finalMessage').textContent = message;
+        }
+
+        function restartGame() {
+            document.getElementById('gameOverScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
